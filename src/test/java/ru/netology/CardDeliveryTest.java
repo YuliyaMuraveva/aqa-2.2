@@ -36,8 +36,9 @@ public class CardDeliveryTest {
 
     @BeforeEach
     public void setUpTest() {
-//        ChromeOptions options = new ChromeOptions();
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        driver = new ChromeDriver(options);
     }
 
     @AfterEach
