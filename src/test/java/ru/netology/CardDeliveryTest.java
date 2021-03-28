@@ -37,7 +37,12 @@ public class CardDeliveryTest {
     @BeforeEach
     public void setUpTest() {
         ChromeOptions options = new ChromeOptions();
+        options.addArguments("start-maximized");
+        options.addArguments("disable-infobars");
         options.addArguments("--headless");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--no-sandbox");
         driver = new ChromeDriver(options);
     }
 
@@ -52,12 +57,12 @@ public class CardDeliveryTest {
     void shouldSubmitOrder() {
         open("http://localhost:9999");
         $("[placeholder='Город']").setValue("Майкоп");
-        $("[placeholder='Дата встречи']").sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
+        $("[placeholder='Дата встречи']").sendKeys(Keys.chord(Keys.SHIFT, Keys.UP), Keys.DELETE);
         $("[placeholder='Дата встречи']").setValue(shouldSetDate());
         $("[name='name']").setValue("Иванов Петр");
         $("[name='phone']").setValue("+71231234567");
         $(".checkbox__box").click();
         $(".button__text").click();
-        $(withText("Успешно")).shouldBe(Condition.visible, Duration.ofSeconds(16));
+        $(withText("Успешно")).shouldBe(Condition.visible, Duration.ofSeconds(15));
     }
 }
