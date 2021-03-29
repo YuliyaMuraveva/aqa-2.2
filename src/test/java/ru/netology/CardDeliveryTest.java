@@ -1,8 +1,6 @@
 package ru.netology;
 
 import com.codeborne.selenide.Condition;
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 
@@ -11,21 +9,17 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Calendar;
 
+import static com.codeborne.selenide.Condition.exactText;
 import static com.codeborne.selenide.Selectors.withText;
 import static com.codeborne.selenide.Selenide.*;
 
 public class CardDeliveryTest {
 
-    public String shouldSetDate() {
+    public String shouldSetDate(int numberDays) {
         Calendar currentDate = Calendar.getInstance();
-        currentDate.add(Calendar.DATE, 5);
+        currentDate.add(Calendar.DATE, numberDays);
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         return dateFormat.format(currentDate.getTime());
-    }
-
-    @BeforeAll
-    static void setUpAll() {
-        WebDriverManager.chromedriver().setup();
     }
 
     @Test
@@ -33,7 +27,31 @@ public class CardDeliveryTest {
         open("http://localhost:9999");
         $("[placeholder='Город']").setValue("Майкоп");
         $("[placeholder='Дата встречи']").sendKeys(Keys.chord(Keys.SHIFT, Keys.UP), Keys.DELETE);
-        $("[placeholder='Дата встречи']").setValue(shouldSetDate());
+        $("[placeholder='Дата встречи']").setValue(shouldSetDate(5));
+        $("[name='name']").setValue("Иванов Петр");
+        $("[name='phone']").setValue("+71231234567");
+        $(".checkbox__box").click();
+        $(".button__text").click();
+        $(withText("Успешно")).shouldBe(Condition.visible, Duration.ofSeconds(15));
+    }
+
+    @Test
+    void shouldSubmitComplexOrder() {
+        open("http://localhost:9999");
+        $("[placeholder='Город']").setValue("ма");
+        $$(".menu-item__control").find(exactText("Майкоп")).click();
+        Calendar currentDate = Calendar.getInstance();
+        Calendar newDate = Calendar.getInstance();
+        newDate.add(Calendar.DATE, 7);
+        String[] monthNames = { "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь" };
+        String month = monthNames[newDate.get(Calendar.MONTH)];
+        $(".icon_name_calendar").click();
+        String monthInCalendar = $(".calendar__name").getText();
+        if (!monthInCalendar.contains(month)) {
+            $(".calendar__title [data-step='1']").click();
+        }
+        String day = Integer.toString(newDate.get(Calendar.DATE));
+        $$(".calendar__day").find(exactText(day)).click();
         $("[name='name']").setValue("Иванов Петр");
         $("[name='phone']").setValue("+71231234567");
         $(".checkbox__box").click();
